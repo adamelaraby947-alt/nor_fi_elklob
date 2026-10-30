@@ -1988,22 +1988,30 @@ document.addEventListener('DOMContentLoaded', () => {
     playText.textContent = 'تشغيل';
   });
 
-    // إعداد الأغنية الافتراضية (بدون تشغيل تلقائي عشان حماية المتصفح)
+  // تجهيز الأغنية الافتراضية
   const defaultSong = document.querySelector('.song-item[data-src="songs/rahma.mp3"]');
   if (defaultSong) {
     defaultSong.classList.add('active');
     bgAudio.src = defaultSong.dataset.src;
   }
 
-  // سر تشغيل الصوت: أول ما المستخدم يدوس في أي حتة، المتصفح هيفك الحظر
-  document.body.addEventListener('click', function() {
-    if (bgAudio.paused) {
-      bgAudio.play().then(() => {
-        playIcon.textContent = '⏸';
-        playText.textContent = 'إيقاف';
-      }).catch(e => console.log("المتصفح رفض التشغيل التلقائي، محتاج ضغطة تانية"));
-    }
-  }, { once: true }); // once: true عشان تنفذ مرة واحدة بس
+  // كسر حماية المتصفح: الزرار ده هيظهر أول ما الصفحة تفتح
+  const unlockBtn = document.createElement('button');
+  unlockBtn.innerText = "اضغط هنا لتشغيل الصوت";
+  unlockBtn.style.cssText = "position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); padding:15px 30px; font-size:18px; background:#BFE9FF; color:#050B1A; border:none; border-radius:50px; z-index:99999; cursor:pointer; font-weight:bold; box-shadow: 0 0 20px rgba(191,233,255,0.5); font-family: 'Cairo', sans-serif;";
+  document.body.appendChild(unlockBtn);
+
+  unlockBtn.addEventListener('click', () => {
+    unlockBtn.remove(); // إخفاء الزرار
+    bgAudio.muted = false; // فك كتم الصوت
+    bgAudio.play().then(() => {
+      playIcon.textContent = '⏸';
+      playText.textContent = 'إيقاف';
+    }).catch((err) => {
+      console.log("فشل التشغيل:", err);
+      alert("المتصفح مش راضي يشغل الصوت، جرب تحدث الصفحة وتدوس تاني.");
+    });
+  });
 });
 </script>
 </body>
