@@ -1988,17 +1988,22 @@ document.addEventListener('DOMContentLoaded', () => {
     playText.textContent = 'تشغيل';
   });
 
-  // تشغيل الأغنية الافتراضية بصمت عشان المتصفح ميزعلش
+    // إعداد الأغنية الافتراضية (بدون تشغيل تلقائي عشان حماية المتصفح)
   const defaultSong = document.querySelector('.song-item[data-src="songs/rahma.mp3"]');
   if (defaultSong) {
     defaultSong.classList.add('active');
     bgAudio.src = defaultSong.dataset.src;
-    bgAudio.muted = true;
-    bgAudio.play().then(() => {
-      playIcon.textContent = '⏸';
-      playText.textContent = 'إيقاف';
-    }).catch(() => {});
   }
+
+  // سر تشغيل الصوت: أول ما المستخدم يدوس في أي حتة، المتصفح هيفك الحظر
+  document.body.addEventListener('click', function() {
+    if (bgAudio.paused) {
+      bgAudio.play().then(() => {
+        playIcon.textContent = '⏸';
+        playText.textContent = 'إيقاف';
+      }).catch(e => console.log("المتصفح رفض التشغيل التلقائي، محتاج ضغطة تانية"));
+    }
+  }, { once: true }); // once: true عشان تنفذ مرة واحدة بس
 });
 </script>
 </body>
